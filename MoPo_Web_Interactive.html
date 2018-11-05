@@ -1,0 +1,608 @@
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
+  <script src="https://d3n8a8pro7vhmx.cloudfront.net/fairvote/pages/10381/attachments/original/1525881644/Congress_GeoJSON.geojson?1525881644"></script>
+  <script src="https://d3n8a8pro7vhmx.cloudfront.net/fairvote/pages/10381/attachments/original/1519147575/State_GeoJSON.geojson?1519147575"></script>
+  <script src="https://d3n8a8pro7vhmx.cloudfront.net/fairvote/pages/10381/attachments/original/1525881641/CongressMapData.geojson?1525881641"></script>
+  <script src="https://d3n8a8pro7vhmx.cloudfront.net/fairvote/pages/10381/attachments/original/1519147581/State_Map_GeoJSON.geojson?1519147581"></script>
+</head>
+<body>
+  <article class="revpost" style = "margin: 0px">
+    <header class="revpost__header" style ="position: relative; width: 130%">
+      <h1 class="revpost__hed">{{ page.name }}</h1>
+    </header>
+    <div class="revpost__col-wrap" style= "position: relative; width: 130%" >
+      <div class="revpost__content">
+        <div class="revpost__cont-wrap">
+          <div class="share-links__wrapper">
+            {% include "share-links" %} 
+          </div>
+          <div>
+            <div id= "partOne">
+              {{ page.basic.content }}
+              <div><table style="width:100%">
+                <tr>
+                  <th style= "background-color:#0739ff"> Democrats </th>
+                  <th style= "background-color:#ba0c00">Republicans</th>
+                  <th style= "background-color:#553285">No Projection</th>
+                </tr>
+                <tr>
+                  <td style= "background-color:#0739ff">173</td>
+                  <td style= "background-color:#ba0c00">207</td><td style= "background-color:#553285">55</td>
+                </tr>
+                </table>
+              </div>
+              <div style ="height 25px"><p> &nbsp;</p></div>
+              <h1>Full Projections</h1>
+              <p>Our full projections for all 435 seats depend on two pieces of information about the 2018 elections we cannot predict: 
+                how much incumbents are favored and how much the nation leans toward one of the two major parties. 
+                Put in those pieces of information to see our projections for all 435 seats. </p>
+              <p></p>
+              <span>How much will the 2018 elections favor incumbents? Click on the button. </span>
+              <div class="dropdown">
+                <button class="dropbtn">Incumbency Bump:</button>
+                <div class="dropdown-content">
+                  <p><input type="radio"  name="radio" value="5" onclick = "javascript: changeIBump()">High (5%)
+                    <span class="checkmark"></span></p>
+                  <p><input type="radio" checked="checked" name="radio" value ="3.3" onclick = "javascript: changeIBump()">Current (3.3%)
+                    <span class="checkmark"></span></p>
+                  <p><input type="radio" name="radio" value = "1" onclick = "javascript: changeIBump()">Low (1%)
+                    <span class="checkmark"></span></p>
+                  <p><input type="radio" name="radio" value ="0" onclick = "javascript: changeIBump()">All Open Seats
+                    <span class="checkmark"></span></p>
+                </div>
+              </div> 
+              <p></p>
+              <p>How much will the 2018 elections favor each political party? Move the slider below:</p>
+              <div class="slidecontainer" style="position: relative">
+                <input type="range" min="400" max="600" value="500" class="slider" id="myRange"></div>
+              <span id="slideLabel" style="position: relative; left: 10px; top:-30px; color:#fff"><span id="demo"></span></span>
+              <div class="barContainer" 
+                   style=" width:100%; overflow:hidden;color:#fff!important;background-color:#ba0c00!important">
+                <div id="safeD" class="barContainer" 
+                     style="height:30px;width:37.4%; float: left; padding: 0px; color:#fff!important;background-color:#0739ff!important"></div>
+                <div id="leanD" class="barContainer" 
+                     style="height:30px;width:2%; float: left; padding: 0px; color:#fff!important;background-color:#6c96ff!important"></div>
+                <div id="tossupD" class="barContainer" 
+                     style="width:2%;color:#fff!important;background-color:#C297DB!important; border-style: none solid none none; border-color:#d3d3d3 "></div>
+                <div id="tossupR" class="barContainer" 
+                     style="width:3.3%; color:#fff!important;background-color:#C297DB!important"></div>
+                <div id="leanR" class="barContainer" 
+                     style="width:4%;color:#fff!important;background-color:#ff5a48!important"></div>
+              </div>
+              <div style="height 24px; width 100%">
+                <span style="position: relative; right: 10px; top:-30px; color:#fff; float:right"> Republican seats: <span id="republicans" ></span>  (<span id="republicansP"></span>%)</span>
+                <span style= "float:left; position: relative; left: 10px; top:-30px; color:#fff" > Democratic seats: <span id="democrats" ></span>  (<span id="democratsP"></span>%)</span>
+              </div>
+              <p> &nbsp;</p>
+              <div id='map' ></div>
+              <div style = "position: relative; top:-130px">
+                <a class="btn btn-default btn-primary" href="https://fairvote.app.box.com/file/230866425247"> Download Full Report</a> 
+                <a class="btn btn-default btn-primary" href="https://docs.google.com/spreadsheets/d/1BWGpap_eLFuNuDXKLT7H4WlBgRfkBVKKllew-v9JQFw/"> View or Download Data as XLSX </a> 
+              </div>
+              <p> &nbsp;</p>
+              <div><table id="endTable" style="width:100%; background-color:#fff; position: relative; top:-130px">
+                <tr>
+                  <th style="color: #000"> District </th>
+                  <th style="color: #000">Incumbent</th>
+                  <th style="color: #000">District Partisanship</th>
+                  <th style="color: #000">Incumbent Modifer</th>
+                  <th style="color: #000"> Projection for a <span id="ratio"></span> Year</th>
+                  <th style="color: #000"> High Confidence Projection</th>
+                </tr>
+                </table>
+              </div>
+              <p> &nbsp;</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <div id="sprite">
+    <svg>
+      <defs>
+        <symbol viewBox="0 0 48.3 99.6" id="facebook"><path class="st0" d="M30.1 23.8v12.3h18.2l-.7 16.8H30.1v46.7H12.4V52.9H0V36.1h12.3V21.7C12.3 10.4 19.6 0 36.4 0c6.8 0 11.8.7 11.8.7l-.4 15.7H37.1c-6.1 0-7 2.8-7 7.4"/></symbol>
+        <symbol viewBox="0 0 128 128" id="twitter"><path d="M128 24.3c-4.7 2.1-9.8 3.5-15.1 4.1 5.4-3.2 9.6-8.4 11.5-14.5-5.1 3-10.7 5.2-16.7 6.4C103 15.2 96.2 12 88.6 12c-14.5 0-26.3 11.8-26.3 26.3 0 2 .2 4.1.7 6-21.8-1.2-41.1-11.6-54.1-27.5-2.2 3.9-3.5 8.4-3.5 13.2 0 9.1 4.6 17.1 11.7 21.9-4.3-.1-8.4-1.3-11.9-3.3v.3c0 12.7 9.1 23.3 21.1 25.7-2.2.6-4.5.9-6.9.9-1.7 0-3.3-.2-4.9-.5 3.3 10.4 13 18 24.5 18.2-9 7-20.3 11.2-32.6 11.2-2.1 0-4.2-.1-6.3-.4 11.6 7.5 25.4 11.8 40.3 11.8 48.3 0 74.7-40 74.7-74.7 0-1.1 0-2.3-.1-3.4 5-3.5 9.5-8.1 13-13.4z"/></symbol>
+        <symbol viewBox="0 0 31 23" id="email"><path d="M31 19.2c0 .6-.2 1.3-.5 1.8l-9.8-10.8 9.7-8.4c.4.6.6 1.3.6 2v15.4zm-15.5-7.1L29 .5c-.6-.3-1.2-.5-1.9-.5H3.9C3.2 0 2.6.2 2 .5l13.5 11.6zm3.8-.7l-3.1 2.7c-.2.2-.4.2-.6.2-.2 0-.5-.1-.6-.2l-3.1-2.7-9.9 11c.4.4 1.2.6 1.9.6h23.2c.7 0 1.4-.2 2.1-.6l-9.9-11zM.6 1.8c-.4.6-.6 1.3-.6 2v15.3c0 .6.2 1.3.5 1.8l9.8-10.8L.6 1.8z"/></symbol>
+        <symbol viewBox="0 0 98.4 98.4" id="play"><path d="M49.2 98.4c27.2 0 49.2-22 49.2-49.2S76.4 0 49.2 0 0 22 0 49.2s22 49.2 49.2 49.2m0-4.7c-24.5 0-44.4-19.9-44.4-44.4S24.7 4.8 49.2 4.8s44.4 19.9 44.4 44.4-19.8 44.5-44.4 44.5M38.5 73c-2.2 1.4-4 .4-4-2.2V28.2c0-2.6 1.8-3.6 4-2.2l33.7 21c2.2 1.4 2.2 3.7 0 5.1L38.5 73"/></symbol>
+      </defs>
+    </svg>
+  </div>
+</body>
+<style>
+  /* Dropdown Button */
+  .dropbtn {
+    background-color: #553285;
+    color: white;
+    padding:0px 8px 0px 8px;
+    font-size: 100%;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+
+  /* The container <div> - needed to position the dropdown content */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 90%;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #f1f1f1}
+
+  /* Show the dropdown menu on hover */
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+  /* Change the background color of the dropdown button when the dropdown content is shown */
+  .dropdown:hover .dropbtn {
+    background-color: #553285;
+  }
+
+  .slidecontainer {
+    width: 100%; /* Width of the outside container */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  }
+
+  /* The slider itself */
+
+  .slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    overflow: hidden;
+    width: 100%; /* Full-width */
+    height: 30px; /* Specified height */
+    background: #ba0c00; /* Red background */
+
+    outline: none; /* Remove outline */
+    opacity: 1; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
+
+  /* Mouse-over effects */
+  .slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+  }
+
+  /* The slider handle (use webkit (Chrome, Opera, Safari, Edge) and moz (Firefox) to override default look) */ 
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 30px; /* Slider handle height */
+    background:#d3d3d3; /* Grey background */
+    box-shadow: -440px 0 0 440px #0739ff; /* blue slider shadow */
+    cursor: pointer; /* Cursor on hover */
+  }
+
+  .slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #d3d3d3; /* Grey background */
+    box-shadow: -440px 0 0 440px #0739ff;
+    cursor: pointer; /* Cursor on hover */
+  }
+  .barContainer {
+    height:30px;
+    padding: 0px;
+    float: left;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  #map {
+    width: 110%;
+    height: 770px;
+    top: -110px;
+    left: -5%;
+    background: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    position: relative; 
+    transform: scale(.909,.8);
+  }
+  .info { 
+    padding: 6px 8px; 
+    font: 14px/16px Arial, Helvetica, sans-serif; 
+    background: white; 
+    background: rgba(255,255,255,0.8); 
+    border-radius: 5px; } 
+  .info h4 { margin: 0 0 5px; color: #777; }
+  .legend { text-align: left; line-height: 30px; color: #555; top: -160px} 
+  .legend i { width: 45px; height: 60px; float: left; margin-right: 8px; opacity: 0.7; }
+  #partOne table, #partOne td, #partOne th {
+    border: 1px solid black;
+  }
+  table {
+    border-collapse: collapse;
+    width: 30%;
+    float: right;
+    text-align: center;
+  }
+
+  td {
+    color: #fff;
+    font-size: 100%;
+  }
+  th {
+    color: #fff;
+    font-size: 100%;
+    text-align: center;
+  }
+
+</style>
+
+<script type="text/javascript">
+  function getIBump(){
+    iBumpVal= document.querySelector('input[name="radio"]:checked').value;
+    return iBumpVal;
+  }
+  function calcIBump(feature){
+    if(feature.open==1){
+      return 0;
+    }else if(getIBump()==0){
+      return 0;
+    }else if(feature.yearFirstE>2014){
+      if(feature.party=="(D)"){
+        return feature.POAC*100+getIBump()*.15;
+      }else{
+        return feature.POAC*100+getIBump()*-.15;
+      }
+    }else{
+      if(feature.party=="(D)"){
+        return feature.POAC*100 +getIBump()*.85;
+      }else{
+        return feature.POAC*100 +getIBump()*-.85;
+      }
+    }
+  }
+  function getProj(props){
+    return props.partisan*100 +(npp-50)+calcIBump(props) ;
+  }
+
+  function percentStyling(number,n){
+    if(n==1){
+      if(number>100){
+        return "100%";
+      }else if(number>=50){
+        return "D+"+(number-50).toFixed(1) +"%";
+      }else{
+        return "R+"+(50-number).toFixed(1) +"%";
+      }
+    }else if(n==3){
+      if(number>=50){
+        if((safeD+leanD+tossupD)>=436){
+          return (number).toFixed(1) +"% Democratic Year (D control)";
+        }else{
+          return (number).toFixed(1) +"% Democratic Year (R control)";
+        }
+      }else{
+        if((safeD+leanD+tossupD)>=436){
+          return 100-(number).toFixed(1) +"% Republican Year (D control)";
+        }else{
+          return 100-(number).toFixed(1) +"% Republican Year (R control)";
+        }
+      }
+    }else{
+      if(number>100){
+        return "Democrat with 100% (Safe D)";
+      }else if(number>56){
+        return "Democrat with "+(number).toFixed(1) +"% (Safe D)";
+      }else if(number>=53){
+        return "Democrat with "+(number).toFixed(1) +"% (Lean D)";
+      }else if(number>=50){
+        return "Democrat with "+(number).toFixed(1) +"% (Tossup D)";
+      }else if(number>=47){
+        return "Republican with "+(100-number).toFixed(1) +"% (Tossup R)";
+      }else if(number>=44){
+        return "Republican with "+(100-number).toFixed(1) +"% (Lean R)";
+      } else if (number<0){
+        return "Republican with 100% (Safe R)";
+      }else{
+        return "Republican with "+(100-number).toFixed(1) +"% (Safe R)";
+      }
+    }
+  }
+
+  var npp =50; /* set default value for National party preference */
+
+  // control that shows state info on hover
+  var info = L.control();
+  info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info');
+    this.update();
+    return this._div;
+  };
+  info.update = function (props) {
+    this._div.innerHTML =  (props ?
+                            '<b>' + props.NAME +' '+(props.Incumbent) +' '+(props.party)+'</b><br />' 
+                            +'District Partisanship:' +percentStyling(props.partisan*100,1) +'%.' +'('+props.pRating+')'+'</b><br />' +
+                            'Projection:  ' +percentStyling(getProj(props),2)+'</b><br />' + "High Confidence Projection: "+props.highConf: 'Hover over a district');
+  };
+
+
+
+  //This function determines how districts are shaded. 
+  function getColor(d) {
+    return d > .56 ? '#0739ff' :
+    d > .53  ? '#6c96ff' :
+    d > .5  ? '#C297DB' :
+    d > .47  ? '#C297DB' :
+    d > .44   ? '#ff5a48' :
+    d=="D" ? '#0739ff' :
+    d== "R"?  '#ba0c00':
+    d=="No projection"? '#C297DB':
+    '#ba0c00';
+  }
+  function getMod(feature){
+    if(calcIBump(feature)==0){
+      return "N/A";
+    }else{
+      if(feature.party=="(R)"){
+        return -calcIBump(feature).toFixed(1);
+      }else{
+        return calcIBump(feature).toFixed(1);
+      }
+    }
+  }
+
+  var safeD = 0;
+  var leanD = 0;
+  var tossupD = 0;
+  var tossupR =0;
+  var leanR=0;
+  var safeR=0;  
+  function getProjection(feature,id){
+    var projection = (feature.partisan*100 +(npp-50)+calcIBump(feature))/100
+    if(projection>.56){
+      safeD = safeD +1 ;
+    } else  if(projection>=.53){
+      leanD = leanD +1;
+    } else  if(projection>=.5){
+      tossupD = tossupD +1;
+    } else  if(projection>=.47){
+      tossupR = tossupR +1;
+    } else  if(projection>=.44){
+      leanR = leanR +1;
+    } else{ 
+      safeR = safeR +1; 
+    }
+    if(id==1){
+      var table = document.getElementById("endTable");
+      var row =table.insertRow()
+      row.innerHTML = "<td style='color: #000'>"+feature.NAME+"</td><td style='color: #000'>"+feature.Incumbent+" "+feature.party+"</td><td style=background-color:"+getColor(feature.partisan)+">"+
+        percentStyling(feature.partisan*100,1)+"</td><td style='color: #000'>"+getMod(feature) +"</td><td style=background-color:"+getColor(projection)+">"+
+        percentStyling(projection*100,2)+"</td><td style=background-color:"+getColor(feature.highConf)+">"+feature.highConf+"</td>";
+    }
+    return projection;
+  }
+
+  //Code below sends each district to the shader function, it has also been modified to 
+  //compile a running tally of Democratic and Republican seats
+  function style(feature) {
+    var projection = getProjection(feature.properties,1);
+    return {
+      fillColor: getColor(projection, npp),
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: .9
+    };
+  }
+  function style2(feature) {
+    var projection = getProjection(feature.properties,2);
+    return {
+      fillColor: getColor(projection, npp),
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: .9
+    };
+  }
+  //creates shading for state boundary lines
+  var statestyle  = {
+    "color": "black",
+    "weight": 3,
+    "opacity": 1,
+  };
+
+  //allows map to be interactive, determines what happens when you highlight a feature
+  function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+      weight: 7,
+      color: '#666',
+      dashArray: '',
+      fillOpacity: 1
+    });
+
+
+    info.update(layer.feature.properties);
+  }
+
+  var geojson;
+
+  function resetHighlight(e) {
+    geojson.resetStyle(e.target);
+    info.update();
+  }                   
+  function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds(),{maxZoom: 7});
+  }
+
+  function onEachFeature(feature, layer) {
+    layer.on({
+      mouseover: highlightFeature,
+      mouseout: resetHighlight,
+      click: zoomToFeature
+    });
+  }
+  //creates initial state of map
+  congmapjson = L.geoJson(CongressMapData, {style: style2,onEachFeature: onEachFeature});
+  geojson = L.geoJson(CongressData, {style: style,onEachFeature: onEachFeature});
+  statejson = L.geoJson(StateData, {style: statestyle,onEachFeature: function(feature,layer){layer.on({
+    click: zoomToFeature
+  });}});
+  mapstatejson  = L.geoJson(statesData, {style: statestyle,onEachFeature: function(feature,layer){layer.on({
+    click: zoomToFeature
+  });}});
+  var cartogram = L.layerGroup([geojson, statejson]);
+  var geography = L.layerGroup([congmapjson, mapstatejson]);
+  var map = L.map('map',{maxZoom: 7, minZoom:4, maxBounds: [[90, -164],[10,-56]]}).setView([38.8, -96], 4.5); /*creates the map pane with a US centric view window */
+  var layers = {"Equal Area Projection": cartogram, "Actual Geography":geography};
+  cartogram.addTo(map);
+  var control =  L.control.layers(layers,null, {position:'bottomleft'}).addTo(map);
+  info.addTo(map);
+  var legend = L.control({position: 'bottomright'});
+  legend.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'info legend');
+    div.innerHTML = '<table><tr><th></th><th style= "background-color:#0739ff"> Democrats </th>'+
+      '<th style= "background-color:#ba0c00">Republicans</th></tr><tr><td style="color: #000">Safe</td>'+
+      '<td style= "background-color:#0739ff">'+safeD/2+'</td><td style= "background-color:#ba0c00">'+safeR/2+'</td></tr>'+
+      '<tr><td style="color: #000">Lean</td><td style= "background-color:#6c96ff">'+leanD/2+'</td>'+
+      '<td style= "background-color:#ff5a48">'+leanR/2+'</td></tr>' +
+      '<tr><td style="color: #000">Tossup</td><td style= "background-color:#C297DB">'+tossupD/2+'</td>'+
+      '<td style= "background-color:#C297DB">'+tossupR/2+'</td></tr></table>';
+    return div;
+  };
+  legend.addTo(map);
+  var slider = document.getElementById("myRange");
+  var ratio =document.getElementById("ratio");
+  var output = document.getElementById("demo");
+  var democrats = document.getElementById("democrats");
+  var republicans = document.getElementById("republicans");
+  var democratsP = document.getElementById("democratsP");
+  var republicansP = document.getElementById("republicansP");
+  var safeDBar = document.getElementById("safeD"); 
+  var leanDBar = document.getElementById("leanD");
+  var tossupDBar = document.getElementById("tossupD"); 
+  var tossupRBar = document.getElementById("tossupR");
+  var leanRBar = document.getElementById("leanR"); 
+  var table = document.getElementById("endTable");
+  output.innerHTML = percentStyling((slider.value)/10,3); // Display the default slider value
+  ratio.innerHTML= "50-50";
+  democrats.innerHTML = 193; //Initialize default values for table variables
+  democratsP.innerHTML = 44.4;
+  republicans.innerHTML =  242;
+  republicansP.innerHTML = 55.6;
+  safeDBar.style.width = ((safeD/870)*100).toFixed(1) + '%'; 
+  leanDBar.style.width = ((leanD/870)*100).toFixed(1) + '%';
+  tossupDBar.style.width = ((tossupD/870)*100).toFixed(1) + '%';
+  tossupRBar.style.width = ((tossupR/870)*100).toFixed(1) + '%';
+  leanRBar.style.width = ((leanR/870)*100).toFixed(1) + '%';
+  // Update the current slider value (each time you drag the slider handle)
+  // Slider code includes codes for basically all elements of the page, so that they all update when
+  //The slider is moved
+  function remap(npp){
+    rnpp=100-npp;
+    safeD = 0;
+    leanD =0;
+    tossupD =0;
+    tossupR = 0;
+    leanR=0;
+    safeR=0;
+    map.removeLayer(legend);
+    table.innerHTML= "<tr><th style='color: #000'> District </th><th style='color: #000'>Incumbent</th>"+
+      "<th style='color: #000'>District Partisanship</th><th style='color: #000'>Incumbent Modifer</th>"+
+      "<th style='color: #000'> Projection for a "+npp +"-"+rnpp+ " Year</th>"+
+      "<th style='color: #000'> High Confidence Projection</th> </tr>";
+    if(map.hasLayer(cartogram)){
+      map.removeLayer(cartogram);
+      control.removeLayer(cartogram);
+      geojson = L.geoJson(CongressData, {style: style,onEachFeature: onEachFeature});
+      congmapjson = L.geoJson(CongressMapData, {style: style2,onEachFeature: onEachFeature});
+      statejson = L.geoJson(StateData, {style: statestyle,onEachFeature: function(feature,layer){layer.on({click: zoomToFeature});}});
+      cartogram = L.layerGroup([geojson, statejson]).addTo(map);
+      layers = {"Equal Area Projection": cartogram, "Actual Geography":geography};
+      control.addBaseLayer(cartogram, "Equal Area Projection");
+
+    } else {
+      map.removeLayer(geography);
+      control.removeLayer(geography);
+      congmapjson = L.geoJson(CongressMapData, {style: style2,onEachFeature: onEachFeature});
+      geojson = L.geoJson(CongressData, {style: style,onEachFeature: onEachFeature});
+      mapstatejson  = L.geoJson(statesData, {style: statestyle,onEachFeature: function(feature,layer){layer.on({click: zoomToFeature});}});
+      geography = L.layerGroup([congmapjson, mapstatejson]).addTo(map);
+      layers = {"Equal Area Projection": cartogram, "Actual Geography":geography};
+      control.addBaseLayer(geography, "Actual Geography");
+    }
+    if((safeD+leanD+tossupD)>217){
+      democrats.innerHTML = (safeD+leanD+tossupD)/2;
+      republicans.innerHTML= (safeR+leanR+tossupR)/2;
+    } else{
+      democrats.innerHTML = (safeD+leanD+tossupD)/2;
+      republicans.innerHTML= (safeR+leanR+tossupR)/2;
+    }
+    democratsP.innerHTML = (((safeD+leanD+tossupD)/870)*100).toFixed(1);
+    republicansP.innerHTML = (((safeR+leanR+tossupR)/870)*100).toFixed(1);
+    ratio.innerHTML = npp + "-" +rnpp;
+    safeDBar.style.width = ((safeD/870)*100).toFixed(1) + '%'; 
+    leanDBar.style.width = ((leanD/870)*100).toFixed(1) + '%';
+    tossupDBar.style.width = ((tossupD/870)*100).toFixed(1) + '%';
+    tossupRBar.style.width = ((tossupR/870)*100).toFixed(1) + '%';
+    leanRBar.style.width = ((leanR/870)*100).toFixed(1) + '%';
+    legend.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend');
+      div.innerHTML = '<table><tr><th></th><th style= "background-color:#0739ff"> Democrats </th>'+
+        '<th style= "background-color:#ba0c00">Republicans</th></tr><tr><td style="color: #000">Safe</td>'+
+        '<td style= "background-color:#0739ff">'+safeD/2+'</td><td style= "background-color:#ba0c00">'+safeR/2+'</td></tr>'+
+        '<tr><td style="color: #000">Lean</td><td style= "background-color:#6c96ff">'+leanD/2+'</td>'+
+        '<td style= "background-color:#ff5a48">'+leanR/2+'</td></tr>' +
+        '<tr><td style="color: #000">Tossup</td><td style= "background-color:#C297DB">'+tossupD/2+'</td>'+
+        '<td style= "background-color:#C297DB">'+tossupR/2+'</td></tr></table>';
+      return div;
+    };
+    legend.addTo(map);
+  }
+  slider.oninput = function() {
+    npp = (this.value)/10; 
+    sl = document.getElementById("slideLabel");
+    if(npp<50){
+      sl.style.float = "right"
+      sl.style.left = "-10px"
+    }else{
+      sl.style.float = "left"
+      sl.style.left = "10px"
+    }
+    remap(npp);
+    output.innerHTML = percentStyling(npp,3);
+
+  }
+  function changeIBump(){
+    getIBump();
+    remap(npp);
+  }
+
+  map.attributionControl.addAttribution('Underlying Data and Shapefile from DailyKos');
+
+
+</script>
