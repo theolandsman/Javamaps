@@ -1,8 +1,16 @@
+//script information for the Monopoly Politics webmap,functions are oriented around calculating Monopoly Politics Statistics, 
+//adjusting them based on inputs from the visualization, and displaying the visualization. 
+
 <script type="text/javascript">
+//getIBump() checks the current value of the incumbency bump as inputted by the user under the incumbency bump dropdown, 
+//default value is 3.3%
   function getIBump(){
     iBumpVal= document.querySelector('input[name="radio"]:checked').value;
     return iBumpVal;
   }
+//calcIBump handicaps the incumbency bump based on FairVote procedures, considering individual candidate performance (POAC) the tendency for new legislators to not
+//attain a full incumpency advantage immediately, and for the incumbency advantage to decline over time. 
+//NOTE: these handicaps are worth revisiting, as the Incumbency advantage is no longer consistently declining every year. 
   function calcIBump(feature){
     if(feature.open==1){
       return 0;
@@ -22,10 +30,13 @@
       }
     }
   }
+//getProj incorporates national party preference information, incumbency bump (including POAC) and the partisanship of the district into
+//a single value which dertimines party competitiveness. 
   function getProj(props){
     return props.partisan*100 +(npp-50)+calcIBump(props) ;
   }
-
+//percent styling takes numbers as they are handled within the scripting, and converts them into outward facing percentages based on 
+//desired look. 
   function percentStyling(number,n){
     if(n==1){
       if(number>100){
@@ -100,6 +111,7 @@
     d=="No projection"? '#C297DB':
     '#ba0c00';
   }
+//this function converts IBump into an outward facing incumbency modifier displayed in the table. 
   function getMod(feature){
     if(calcIBump(feature)==0){
       return "N/A";
@@ -118,6 +130,7 @@
   var tossupR =0;
   var leanR=0;
   var safeR=0;
+//more advanced version of getproj which adds features to the table as projection metrics are calculated. 
   function getProjection(feature,id){
     var projection = (feature.partisan*100 +(npp-50)+calcIBump(feature))/100
     if(projection>.56){
