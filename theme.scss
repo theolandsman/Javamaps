@@ -1,0 +1,142 @@
+@import "mixins";
+
+
+
+$primary-color: #553285;
+$medium-color: #A173D8;
+$lighter-color: #C297DB;
+$accent-color: #19b2cc;
+
+$light-grey: #ebebeb;
+$dark-grey: #263237;
+
+body {
+  font-family: 'proxima-nova', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: $accent-color;
+  &:hover {
+    color: darken($accent-color, 7%);
+  }
+}
+
+.page-headline {
+    font-size: 1.2em;
+    color: #553285;
+    text-transform: uppercase;
+}
+
+.intro {
+  font-size: 1.5em;
+}
+
+.btn {
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  @include button-variant(#fff, $primary-color, $primary-color);
+}
+
+.btn-medium {
+  @include button-variant(#fff, $medium-color, $medium-color);
+}
+
+.btn-accent {
+  @include button-variant(#fff, $accent-color, $accent-color);
+}
+
+.btn-dark {
+  @include button-variant(#fff, $dark-grey, $dark-grey);
+}
+
+
+.btn-ghost {
+  transition: 0.2s;
+}
+
+
+.background-image-holder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+.overlay {
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    opacity: 0.3;
+  }
+  &.primary-overlay:after {
+    background-color: $primary-color;
+  }
+  &.secondary-overlay:after {
+    background-color: $lighter-color;
+  }
+}
+
+// general: video aspect ratios
+.video-container {
+  position: relative;
+  padding-bottom: 50%;
+  height: 0px;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.first-row {
+  margin-top: 180px;
+  margin-bottom: 30px;
+  transition: margin-top 0.2s;
+  &.scrolled {
+    margin-top: 100px;
+  }
+}
+
+
+@media (max-width: 991px) {
+  .first-row {
+    margin-top: 160px;
+  }
+}
+
+@media (max-width: 767px) {
+  .first-row {
+    margin-top: 180px;
+  }
+}
+
+@import "header";
+@import "nav";
+@import "homepage";
+@import "footer";
+@import "interior";
+@import "slide_out";
+@import "blog_hub";
+@import "mobile";
+@import "adminbar";
+@import "search";
